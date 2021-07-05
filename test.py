@@ -1,3 +1,5 @@
-print("Hello world")
-print("test")
-print("Mr Sparrow is the ....")
+z = []
+x = [1,2,3]
+
+z.insert(0,x)
+print(z)
