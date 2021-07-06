@@ -32,7 +32,7 @@ class Network:
         z = []
         for x in range(0, len(weights)):
             for i in range(0, len(weights[1])):
-                temp += inp_act[i]*weight[x][i]
+                temp += inp_act[i]*weights[x][i]
             z.append(temp + bias[z])
             temp = 0
         return z
