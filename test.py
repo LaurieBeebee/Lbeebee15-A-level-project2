@@ -1,5 +1,10 @@
-z = []
-x = [1,2,3]
+import csv
 
-z.insert(0,x)
-print(z)
+Iris = open("Iris.csv","r")
+Irisreader = csv.reader(Iris)
+for row in Irisreader:
+    if row[0] == "50":
+        print(row)
+
+
+

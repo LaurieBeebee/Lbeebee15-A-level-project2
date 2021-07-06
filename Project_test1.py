@@ -1,15 +1,21 @@
 import numpy
 import random
-import math
+import csv
+
 
 class Network:
-    def __init__(self, no_layers, no_neurons, no_initial_inputs):
+    def __init__(self, no_layers, no_neurons, no_initial_inputs, input_activations):
         self.layers = int(no_layers)
         self.neurons = int(no_neurons)
         self.no_ini_inputs = int(no_initial_inputs)
+        self.inp_act = input_activations
 
     #inp_act needs to be inputted as a list of all of the input activations. this can be assigned from the first input or just the input
     #into that layer later on when actually being coded.
+
+    #got database now but need to think about how im going to loop through the number of neurons in each layer when setting weights
+    #biases as it is changing and may not want same number of neurons in each layer. also need to think about final layer and how that
+    #will work
 
     def weight_set(self, inp_act):
         input_weights = []
@@ -46,6 +52,17 @@ class Network:
         for i in range(0,self.neurons - 1):
             act[i] = self.sigmoid(z[i])
         return act
+
+
+def main():
+    Iris = open("Iris.csv","r")
+    Irisreader = csv.reader(Iris)
+    test_data_no = random.randint(1,150)
+    for row in Irisreader:
+        if row == test_data_no:
+            test_data = row
+    flower = Network(2,5,6,test_data)
+
 
 
 
