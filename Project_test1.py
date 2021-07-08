@@ -62,6 +62,7 @@ def main():
         if row == test_data_no:
             test_data = row
     flower = Network(2,5,6,test_data)
+    
 
 
 
