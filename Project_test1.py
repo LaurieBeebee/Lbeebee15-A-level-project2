@@ -58,7 +58,7 @@ class Network:
 
     def first_layer_activations(self):
         activations = []
-        for i in range(0,len(self.inp_act):
+        for i in range(0,len(self.inp_act)):
             activations.append(self.sigmoid(self.inp_act[i]))
         return activations
 
@@ -93,7 +93,7 @@ Iris = open("Iris.csv","r")
 Irisreader = csv.reader(Iris)
 test_data_no = random.randint(1,150)
 test_data = []
-for row in Irisreader:
+for row in Irisreader: # can make this a lot better by doing a binary search rather than just a linear search
     if row[0] == str(test_data_no):
         test_data = [row[1],row[2],row[3],row[4]] #this is specific to this database so if changing the code this must be edited.
 flower = Network(2,5,test_data,3)
