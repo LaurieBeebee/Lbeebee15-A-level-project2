@@ -18,7 +18,12 @@ class Network:
         self.neurons = int(no_hidden_layer_neurons)
         self.inp_act = test_data
         self.no_outputs = int(no_outputs)
-
+        if self.correct_output == "Iris-setosa": #would need to be changed if using different database
+            self.desired_outputs = [1,0,0]
+        elif self.correct_output == "Iris-versicolor":
+            self.desired_outputs = [0,1,0]
+        elif self.correct_output == "Iris-virginica":
+            self.desired_outputs = [0,0,1]
 
 
     #inp_act needs to be inputted as a list of all of the input activations. this can be assigned from the first input or just the input
@@ -68,6 +73,10 @@ class Network:
         x = float(x)
         return 1/(1+numpy.exp(-x))
 
+    def inv_sigmoid(self,x):
+        x = float(x)
+        return (numpy.exp(-x)/(numpy.exp(-x)+1)**2)
+
     def first_layer_activations(self):
         activations = []
         for i in range(0,len(self.inp_act)):
@@ -110,29 +119,29 @@ class Network:
 
     def cost(self, activations):
         cost = []
-        cost_temp = 0
-        if self.correct_output == "Iris-setosa":
-            cost_temp = 0.5*((1 - activations[self.layers][0])**2)
-            cost.append(cost_temp)
-            cost_temp = 0.5*((0 - activations[self.layers][1])**2)
-            cost.append(cost_temp)
-            cost_temp = 0.5*((0 - activations[self.layers][2])**2)
-            cost.append(cost_temp)
-        elif self.correct_output == "Iris-versicolor":
-            cost_temp = 0.5*((0 - activations[self.layers][0])**2)
-            cost.append(cost_temp)
-            cost_temp = 0.5*((1 - activations[self.layers][1])**2)
-            cost.append(cost_temp)
-            cost_temp = 0.5*((0 - activations[self.layers][2])**2)
-            cost.append(cost_temp)
-        elif self.correct_output == "Iris-virginica":
-            cost_temp = 0.5*((0 - activations[self.layers][0])**2)
-            cost.append(cost_temp)
-            cost_temp = 0.5*((0 - activations[self.layers][1])**2)
-            cost.append(cost_temp)
-            cost_temp = 0.5*((1 - activations[self.layers][2])**2)
-            cost.append(cost_temp)
+        for i in range(len(self.desired_outputs)):
+            cost.append(0.5*((self.desired_outputs[i] - activations[self.layers][i])**2))
         return cost
+
+    def final_layer_error(self, z, activations):
+        final_layer_error = []
+        for i in range(self.no_outputs):
+            final_layer_error.append(((activations[self.layers][i]-self.desired_outputs[i])*self.inv_sigmoid(z[self.layers][i])))
+        return final_layer_error
+
+    def dicttomat(self,weights,x,y,no_neurons): # have to remember that this is individual to each layer and have to know how many neurons in each layer and change it each time.
+        A = []
+        mat = []
+        for i in range(no_neurons):
+            for z in range(len(weights[x][y])):
+                A.append(weights[x][z][i])
+            mat.append(A)
+            A = []
+        full_mat = numpy.array(mat)
+        return(full_mat)
+
+   def errorbackprop(self,weights,error,z):
+
 
 
 
@@ -149,7 +158,10 @@ print(activations)
 cost = flower.cost(activations)
 print(cost)
 print(flower.correct_output)
-
+final_layer_error = flower.final_layer_error(all_z,activations)
+print(final_layer_error)
+layer_1_matrix = flower.dicttomat(all_weights,0,0,4) # have to remember that this is individual to each layer and have to know how many neurons in each layer and change it each time.
+print(layer_1_matrix)
 
 
 
