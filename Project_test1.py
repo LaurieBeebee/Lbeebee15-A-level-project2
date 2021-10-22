@@ -141,6 +141,8 @@ class Network:
         return(full_mat)
 
    def errorbackprop(self,weights,error,z):
+        for i in range(0, len(weights)):
+            matrix = self.dictomat(weights,i,)
 
 
 
