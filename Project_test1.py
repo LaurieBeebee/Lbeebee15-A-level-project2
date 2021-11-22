@@ -129,21 +129,28 @@ class Network:
             final_layer_error.append(((activations[self.layers][i]-self.desired_outputs[i])*self.inv_sigmoid(z[self.layers][i])))
         return final_layer_error
 
-    def dicttomat(self,weights,x,y,no_neurons): # have to remember that this is individual to each layer and have to know how many neurons in each layer and change it each time.
-        A = []
-        mat = []
-        for i in range(no_neurons):
-            for z in range(len(weights[x][y])):
-                A.append(weights[x][z][i])
-            mat.append(A)
-            A = []
-        full_mat = numpy.array(mat)
-        return(full_mat)
+    def dicttomat_weights(self,weights,x): # have to remember that this is individual to each layer and have to know how many neurons in each layer and change it each time.
+        mat = weights[x]
+        mat = numpy.asarray(mat)
+        return(mat)
 
-   def errorbackprop(self,weights,error,z):
-        for i in range(0, len(weights)):
-            matrix = self.dictomat(weights,i,)
+    def errorbackprop(self,weights,final_layer_error,z):
+        layer_error = []
+        all_layer_error = []
+        for i in reversed(range(1,len(weights))):
+            mat = self.dicttomat_weights(weights,i)
+            if i == len(weights)-1:
+                layer_error = numpy.reshape(final_layer_error,((len(final_layer_error)),1))
+            for x in range(0, len(z[i-1])):
+                z[i-1][x] = self.inv_sigmoid(z[i-1][x])
+            z[i-1] = numpy.reshape(z[i-1],(len(z[i-1]),1))
+            prev_layer_error = numpy.multiply((numpy.matmul(mat.transpose(),layer_error)),(z[i-1]))
+            all_layer_error.append(prev_layer_error)
+            layer_error = prev_layer_error
+        all_layer_error.append(numpy.reshape(final_layer_error,(len(final_layer_error),1)))
+        return(all_layer_error)
 
+    #def derivcosttoweight(self,activations,first_layer_activations,errors):
 
 
 
@@ -157,13 +164,18 @@ all_z = flower.z(all_weights,all_biases)
 print(all_z)
 activations = flower.activations(all_z)
 print(activations)
+first_layer_activations = flower.first_layer_activations()
+print(first_layer_activations)
 cost = flower.cost(activations)
 print(cost)
 print(flower.correct_output)
 final_layer_error = flower.final_layer_error(all_z,activations)
 print(final_layer_error)
-layer_1_matrix = flower.dicttomat(all_weights,0,0,4) # have to remember that this is individual to each layer and have to know how many neurons in each layer and change it each time.
+layer_1_matrix = flower.dicttomat_weights(all_weights,0) # have to remember that this is individual to each layer and have to change each time
 print(layer_1_matrix)
+all_error = flower.errorbackprop(all_weights,final_layer_error, all_z)
+print(all_error)
+
 
 
 
