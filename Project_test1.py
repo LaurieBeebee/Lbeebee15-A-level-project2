@@ -4,7 +4,7 @@ import csv
 
 
 class Network:
-    def __init__(self, no_hidden_layers, no_hidden_layer_neurons, no_outputs):
+    def __init__(self, no_hidden_layers, no_hidden_layer_neurons, no_outputs, learning_rate):
         Iris = open("Iris.csv", "r")
         Irisreader = csv.reader(Iris)
         self.test_data_no = random.randint(1, 150)
@@ -18,6 +18,7 @@ class Network:
         self.neurons = int(no_hidden_layer_neurons)
         self.inp_act = test_data
         self.no_outputs = int(no_outputs)
+        self.learning_rate = int(learning_rate)
         if self.correct_output == "Iris-setosa": #would need to be changed if using different database
             self.desired_outputs = [1,0,0]
         elif self.correct_output == "Iris-versicolor":
@@ -150,33 +151,109 @@ class Network:
         all_layer_error.append(numpy.reshape(final_layer_error,(len(final_layer_error),1)))
         return(all_layer_error)
 
-    #def derivcosttoweight(self,activations,first_layer_activations,errors):
+    def derivcosttoweight(self,activations,first_layer_activations,errors):
+        count = 0
+        derive_cost_to_weight = {}
+        temp = []
+        input_temp = []
+        activ = first_layer_activations
+        for i in range(0, len(errors)):
+            for x in range(0, len(errors[i])):
+                for y in range(0, len(activ)):
+                    temp.append(activ[y]*errors[i][x][0])
+                input_temp.append(temp)
+                temp = []
+            derive_cost_to_weight[count] = input_temp
+            input_temp = []
+            activ = activations[count]
+            count+=1
+        return(derive_cost_to_weight)
+
+    def gradient_descent(self, weights, biases, derivcosttoweight, errors):
+        for i in range(0, len(weights)):
+            for x in range(0, len(weights[i])):
+                for y in range(0, len(weights[i][x])):
+                    weights[i][x][y] += self.learning_rate*derivcosttoweight[i][x][y]
+        for i in range(0,len(biases)):
+            for x in range(0, len(biases[i])):
+                biases[i][x] += self.learning_rate*errors[i][x][0]
+        return(weights, biases)
+
+    def output(self,activations):
+        output = ""
+        if activations[self.layers][0] > activations[self.layers][1] and activations[self.layers][0] > activations[self.layers][2]:
+            output = "Iris-setosa"
+        elif activations[self.layers][1] > activations[self.layers][0] and activations[self.layers][1] > activations[self.layers][2]:
+            output = "Iris-versicolor"
+        else:
+            output = "Iris-virginica"
+        return output
+
+
+    def main(self):
+        count = 1
+        weights = self.total_weights()
+        biases = self.total_bias()
+        while count <= 70 and count != 0:
+            count = 1
+            for i in range(0,99):
+                z = self.z(weights,biases)
+                activations = self.activations(z)
+                first_layer_activations = self.first_layer_activations()
+                cost = self.cost(activations)
+                final_layer_error = self.final_layer_error(z,activations)
+                all_error = self.errorbackprop(weights,final_layer_error,z)
+                deriv_cost_to_weight = self.derivcosttoweight(activations,first_layer_activations,all_error)
+                weights = self.gradient_descent(weights,biases,deriv_cost_to_weight,all_error)[0]
+                biases = self.gradient_descent(weights,biases,deriv_cost_to_weight,all_error)[1]
+                if self.output(activations) == self.correct_output:
+                    count+=1
+                Iris = open("Iris.csv", "r")
+                Irisreader = csv.reader(Iris)
+                self.test_data_no = random.randint(1, 150)
+                test_data = []
+                for row in Irisreader:  # can make this a lot better by doing a binary search rather than just a linear search
+                    if row[0] == str(self.test_data_no):
+                        test_data = [row[1], row[2], row[3], row[4]]  # this is specific to this database so if changing the code this must be edited.
+                        self.correct_output = str(row[5])
+                Iris.close()
+                self.inp_act = test_data
+            print(count)
 
 
 
 
-flower = Network(2,5,3)
-all_weights = flower.total_weights()
-print(all_weights)
-all_biases = flower.total_bias()
-print(all_biases)
-all_z = flower.z(all_weights,all_biases)
-print(all_z)
-activations = flower.activations(all_z)
-print(activations)
-first_layer_activations = flower.first_layer_activations()
-print(first_layer_activations)
-cost = flower.cost(activations)
-print(cost)
-print(flower.correct_output)
-final_layer_error = flower.final_layer_error(all_z,activations)
-print(final_layer_error)
-layer_1_matrix = flower.dicttomat_weights(all_weights,0) # have to remember that this is individual to each layer and have to change each time
-print(layer_1_matrix)
-all_error = flower.errorbackprop(all_weights,final_layer_error, all_z)
-print(all_error)
 
 
+
+
+
+flower = Network(2,5,3,3)
+# all_weights = flower.total_weights()
+# print(all_weights)
+# all_biases = flower.total_bias()
+# print(all_biases)
+# all_z = flower.z(all_weights,all_biases)
+# print(all_z)
+# activations = flower.activations(all_z)
+# print(activations)
+# first_layer_activations = flower.first_layer_activations()
+# print(first_layer_activations)
+# cost = flower.cost(activations)
+# print(cost)
+# print(flower.correct_output)
+# final_layer_error = flower.final_layer_error(all_z,activations)
+# print(final_layer_error)
+# layer_1_matrix = flower.dicttomat_weights(all_weights,0) # have to remember that this is individual to each layer and have to change each time
+# print(layer_1_matrix)
+# all_error = flower.errorbackprop(all_weights,final_layer_error, all_z)
+# print(all_error)
+# derivcosttoweight = flower.derivcosttoweight(activations,first_layer_activations,all_error)
+# print(derivcosttoweight)
+# gradient_descent = flower.gradient_descent(all_weights,all_biases,derivcosttoweight,all_error)
+# print(gradient_descent[0])
+# print(gradient_descent[1])
+flower.main()
 
 
 
