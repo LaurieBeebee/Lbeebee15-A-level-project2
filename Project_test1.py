@@ -1,6 +1,7 @@
 import numpy
 import random
 import csv
+import time
 
 
 class Network:
@@ -173,10 +174,10 @@ class Network:
         for i in range(0, len(weights)):
             for x in range(0, len(weights[i])):
                 for y in range(0, len(weights[i][x])):
-                    weights[i][x][y] += self.learning_rate*derivcosttoweight[i][x][y]
+                    weights[i][x][y] -= self.learning_rate*derivcosttoweight[i][x][y]
         for i in range(0,len(biases)):
             for x in range(0, len(biases[i])):
-                biases[i][x] += self.learning_rate*errors[i][x][0]
+                biases[i][x] -= self.learning_rate*errors[i][x][0]
         return(weights, biases)
 
     def output(self,activations):
@@ -192,10 +193,12 @@ class Network:
 
     def main(self):
         count = 1
+        temp_count = 0
+        no_count = 0
         weights = self.total_weights()
         biases = self.total_bias()
-        while count <= 70 and count != 0:
-            count = 1
+        while count <= 70 and count > 0:
+            count = 0
             for i in range(0,99):
                 z = self.z(weights,biases)
                 activations = self.activations(z)
@@ -218,7 +221,12 @@ class Network:
                         self.correct_output = str(row[5])
                 Iris.close()
                 self.inp_act = test_data
-            print(count)
+            temp_count += count
+            no_count += 1
+            if no_count == 30:
+                print(temp_count//no_count)
+                temp_count = 0
+                no_count = 0
 
 
 
@@ -228,6 +236,8 @@ class Network:
 
 
 
+
+start = time.process_time()
 flower = Network(2,5,3,3)
 # all_weights = flower.total_weights()
 # print(all_weights)
@@ -254,6 +264,7 @@ flower = Network(2,5,3,3)
 # print(gradient_descent[0])
 # print(gradient_descent[1])
 flower.main()
+print(time.process_time() - start)
 
 
 
