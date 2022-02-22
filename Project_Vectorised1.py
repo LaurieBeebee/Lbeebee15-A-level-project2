@@ -7,8 +7,8 @@ import time
 
 LEARNING_RATE = 0.005
 
-X = np.zeros((4, 150), float)
-Y = np.zeros((3, 150), int)
+X = np.zeros((4, 130), float)
+Y = np.zeros((3, 130), int)
 
 Iris = open("Iris.csv", "r")
 Irisreader = csv.reader(Iris)
@@ -33,6 +33,7 @@ for row in Irisreader:
             Y[2, count] = 1
         count += 1
 Iris.close()
+
 
 def weight_set():
     w0 = np.random.randn(5, 4)
@@ -68,7 +69,7 @@ def all_z_activations(w0, w1, w2, b1, b2, b3, x):
     return z1, z2, z3, a1, a2, a3
 
 def errors(w1, w2, z1, z2, z3, a3, Y):
-    errors3 = (a3 - Y) * inv_sigmoid(z3)
+    errors3 = (a3 - Y) #* inv_sigmoid(z3)
     errors2 = np.dot(np.transpose(w2), errors3)*inv_sigmoid(z2)
     errors1 = np.dot(np.transpose(w1), errors2)*inv_sigmoid(z1)
     return errors1, errors2, errors3
@@ -90,7 +91,9 @@ def gradient_descent(w0, w1, w2, b1, b2, b3, error1, error2, error3, dw0, dw1, d
 
 def cost(Y, a3):
     cost = 1/np.shape(Y)[1]*np.sum((Y - a3)**2)
+    #cost = np.dot(Y, np.log(a3)) + np.dot((1 - Y), np.log(1 - a3))
     return cost
+
 
 def main():
     tic = time.time()
@@ -98,7 +101,7 @@ def main():
     biases = bias_set()
     z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X)
     toc = time.time()
-    while cost(Y, z_and_activations[5]) > 0 and toc-tic <= 300:
+    while cost(Y, z_and_activations[5]) > 0 and toc-tic <= 50:
         z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X)
         error = errors(weights[1], weights[2], z_and_activations[0], z_and_activations[1], z_and_activations[2], z_and_activations[5], Y)
         derivitive_cost_to_weight = deriv_cost_to_weight(error[0], error[1], error[2], z_and_activations[3], z_and_activations[4], X)
@@ -106,11 +109,16 @@ def main():
         cost1= cost(Y, z_and_activations[5])
         print(cost1)
         toc = time.time()
-    print(test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2]))
+    count = 0
+    test_result = 0
+    while count != 1:
+        test_result += test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2])
+        count += 1
+    print(test_result/count)
 
 def test(w0, w1, w2, b1, b2, b3):
-    X = np.zeros((4, 150), float)
-    Y = np.zeros((3, 150), int)
+    X = np.zeros((4, 22), float)
+    Y = np.zeros((3, 22), int)
 
     correct = 0
 
@@ -119,7 +127,7 @@ def test(w0, w1, w2, b1, b2, b3):
     count = 0
     for row in Irisreader:
         if row[0] != "Id":
-            # if (int(row[0]) >= 40 and int(row[0]) < 51) or (int(row[0]) >= 90 and int(row[0]) < 101) or (int(row[0]) >= 140 and int(row[0]) < 151):
+            if (row[0] >= "41" and row[0] < "51") or (row[0] >= "91" and row[0] < "101") or (row[0] >= "141" and row[0] < "151"):
                 X[0, count] = float(row[1])
                 X[1, count] = float(row[2])
                 X[2, count] = float(row[3])
@@ -152,7 +160,10 @@ def test(w0, w1, w2, b1, b2, b3):
             output = "Iris-virginica"
             if Y[2,i] == 1:
                 correct += 1
+    print(X)
+    print(Y)
     return (correct/count)*100
+
 
 
 
