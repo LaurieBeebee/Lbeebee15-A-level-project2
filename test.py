@@ -1,5 +1,6 @@
 import csv
 import random
+import pandas as pd
 
 
 def database_test():
@@ -23,4 +24,6 @@ def weight_set_test():
     return weights
 
 
-weight_set_test()
+print(pd.read_csv('Iris.csv'))
+x = pd.read_csv('Iris.csv')
+print(x.loc[1, ['SepalLengthCm', 'PetalLengthCm']])

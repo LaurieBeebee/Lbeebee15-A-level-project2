@@ -58,7 +58,7 @@ def inv_sigmoid(x):
 def z(weight, prev_activation, bias):
     z = np.dot(weight, prev_activation) + bias
     return z
-
+#todo need to try and do ln instead of the bloody quadratic as well as try and see if the
 def all_z_activations(w0, w1, w2, b1, b2, b3, x):
     z1 = z(w0, x, b1)
     a1 = sigmoid(z1)
@@ -111,14 +111,14 @@ def main():
         toc = time.time()
     count = 0
     test_result = 0
-    while count != 1:
+    while count != 30:
         test_result += test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2])
         count += 1
     print(test_result/count)
 
 def test(w0, w1, w2, b1, b2, b3):
-    X = np.zeros((4, 22), float)
-    Y = np.zeros((3, 22), int)
+    X = np.zeros((4, 150), float)
+    Y = np.zeros((3, 150), int)
 
     correct = 0
 
@@ -127,7 +127,7 @@ def test(w0, w1, w2, b1, b2, b3):
     count = 0
     for row in Irisreader:
         if row[0] != "Id":
-            if (row[0] >= "41" and row[0] < "51") or (row[0] >= "91" and row[0] < "101") or (row[0] >= "141" and row[0] < "151"):
+            #if (row[0] >= "41" and row[0] < "51") or (row[0] >= "91" and row[0] < "101") or (row[0] >= "141" and row[0] < "151"):
                 X[0, count] = float(row[1])
                 X[1, count] = float(row[2])
                 X[2, count] = float(row[3])
@@ -160,8 +160,6 @@ def test(w0, w1, w2, b1, b2, b3):
             output = "Iris-virginica"
             if Y[2,i] == 1:
                 correct += 1
-    print(X)
-    print(Y)
     return (correct/count)*100
 
 
