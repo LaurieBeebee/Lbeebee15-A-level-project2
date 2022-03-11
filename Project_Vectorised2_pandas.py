@@ -8,13 +8,26 @@ import pandas as pd
 LEARNING_RATE = 0.005
 #
 # X = np.zeros((4, 130), float)
-# Y = np.zeros((3, 130), int)
+Y = np.zeros((3, 150), int)
 
 Iris = pd.read_csv("Iris.csv")
 X = np.transpose(Iris.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]])
-Y = np.transpose(Iris.loc[:150, ["Species"]])
-print(Y)
-print(X)
+y = np.transpose(Iris.loc[:150, ["Species"]])
+shape = y.shape
+for i in range(0, shape[1]):
+    if y.loc["Species", i] == "Iris-setosa":
+        Y[0, i] = 1
+        Y[1, i] = 0
+        Y[2, i] = 0
+    elif y.loc["Species", i] == "Iris-versicolor":
+        Y[0, i] = 0
+        Y[1, i] = 1
+        Y[2, i] = 0
+    elif y.loc["Species", i] == "Iris-virginica":
+        Y[0, i] = 0
+        Y[1, i] = 0
+        Y[2, i] = 1
+
 # count = 0
 # for row in Irisreader:
 #     if (row[0] >= "1" and row[0] < "41") or (row[0] >= "51" and row[0] < "91") or (row[0] >= "101" and row[0] < "141"):
