@@ -34,7 +34,6 @@ for row in Irisreader:
         count += 1
 Iris.close()
 
-
 def weight_set():
     w0 = np.random.randn(5, 4)
     w1 = np.random.randn(5, 5)
@@ -90,10 +89,9 @@ def gradient_descent(w0, w1, w2, b1, b2, b3, error1, error2, error3, dw0, dw1, d
     return w0, w1, w2, b1, b2, b3
 
 def cost(Y, a3):
-    cost = 1/np.shape(Y)[1]*np.sum((Y - a3)**2)
-    #cost = np.dot(Y, np.log(a3)) + np.dot((1 - Y), np.log(1 - a3))
+    #cost = 1/np.shape(Y)[1]*np.sum((Y - a3)**2)
+    cost = np.dot(Y, (np.log(a3)) + np.dot((1 - Y)), np.log(1 - a3))
     return cost
-
 
 def main():
     tic = time.time()

@@ -238,7 +238,7 @@ class Network:
 
 
 start = time.process_time()
-flower = Network(2,5,3,3)
+flower = Network(2,5,3,0.05)
 # all_weights = flower.total_weights()
 # print(all_weights)
 # all_biases = flower.total_bias()

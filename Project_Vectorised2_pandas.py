@@ -2,6 +2,8 @@ import numpy as np
 import csv
 import time
 import pandas as pd
+from sklearn.model_selection import train_test_split
+#import mapplotlib.pyplot as plt
 
 # 2 hidden layers, 5 neurons each
 
@@ -11,22 +13,31 @@ LEARNING_RATE = 0.005
 Y = np.zeros((3, 150), int)
 
 Iris = pd.read_csv("Iris.csv")
-X = np.transpose(Iris.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]])
-y = np.transpose(Iris.loc[:150, ["Species"]])
-shape = y.shape
+X = Iris.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]]
+y = Iris.loc[:150, ["Species"]]
+X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+X_train = np.transpose(X_train.values)
+X_test = np.transpose(X_test.values)
+Y_train = np.transpose(Y_train.values)
+Y_test = np.transpose(Y_test.values)
+
+shape = Y_train.shape
+Y = np.zeros((3, shape[1]), int)
 for i in range(0, shape[1]):
-    if y.loc["Species", i] == "Iris-setosa":
+    if Y_train[0, i] == "Iris-setosa":
         Y[0, i] = 1
         Y[1, i] = 0
         Y[2, i] = 0
-    elif y.loc["Species", i] == "Iris-versicolor":
+    elif Y_train[0, i] == "Iris-versicolor":
         Y[0, i] = 0
         Y[1, i] = 1
         Y[2, i] = 0
-    elif y.loc["Species", i] == "Iris-virginica":
+    elif Y_train[0, i] == "Iris-virginica":
         Y[0, i] = 0
         Y[1, i] = 0
         Y[2, i] = 1
+
+
 
 # count = 0
 # for row in Irisreader:
@@ -74,7 +85,7 @@ def inv_sigmoid(x):
 def z(weight, prev_activation, bias):
     z = np.dot(weight, prev_activation) + bias
     return z
-#todo need to try and do ln instead of the bloody quadratic as well as try and see if the
+
 def all_z_activations(w0, w1, w2, b1, b2, b3, x):
     z1 = z(w0, x, b1)
     a1 = sigmoid(z1)
@@ -106,65 +117,84 @@ def gradient_descent(w0, w1, w2, b1, b2, b3, error1, error2, error3, dw0, dw1, d
     return w0, w1, w2, b1, b2, b3
 
 def cost(Y, a3):
-    cost = 1/np.shape(Y)[1]*np.sum((Y - a3)**2)
-    #cost = np.dot(Y, np.log(a3)) + np.dot((1 - Y), np.log(1 - a3))
+    #cost = 1/np.shape(Y)[1]*np.sum((Y - a3)**2)
+    #cost = np.dot(Y, np.log(np.transpose(a3))) + np.dot((1 - Y), np.log(np.transpose(1 - a3)))
+    cost = (-1./np.shape(Y)[1]) * np.sum(Y * np.log(a3) + (1 - Y) * np.log(1 - a3))
     return cost
 
 
-def main():
+def main_train():
+    costs = [] #keep track of costs
     tic = time.time()
     weights = weight_set()
     biases = bias_set()
-    z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X)
-    #todo have to change either the a3 output or the Y to make sure that it matches so that i can use the cost function cause currently it is a 3*150 for the a3 and the Y just has the string answers in it
+    z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
     toc = time.time()
-    while cost(Y, z_and_activations[5]) > 0 and toc-tic <= 50:
-        z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X)
+    while toc-tic <= 50:
+        z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
         error = errors(weights[1], weights[2], z_and_activations[0], z_and_activations[1], z_and_activations[2], z_and_activations[5], Y)
-        derivitive_cost_to_weight = deriv_cost_to_weight(error[0], error[1], error[2], z_and_activations[3], z_and_activations[4], X)
-        change_weights_and_biases = gradient_descent(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], error[0], error[1], error[2], derivitive_cost_to_weight[0], derivitive_cost_to_weight[1], derivitive_cost_to_weight[2], X)
-        cost1= cost(Y, z_and_activations[5])
+        derivitive_cost_to_weight = deriv_cost_to_weight(error[0], error[1], error[2], z_and_activations[3], z_and_activations[4], X_train)
+        change_weights_and_biases = gradient_descent(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], error[0], error[1], error[2], derivitive_cost_to_weight[0], derivitive_cost_to_weight[1], derivitive_cost_to_weight[2], X_train)
+        cost1 = cost(Y, z_and_activations[5])
         print(cost1)
+        costs.append(cost1)
         toc = time.time()
     count = 0
     test_result = 0
-    # while count != 30:
-    #     test_result += test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2])
-    #     count += 1
-    # print(test_result/count)
+    while count != 30:
+        test_result += test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2])
+        count += 1
+    print(test_result/count)
 
 def test(w0, w1, w2, b1, b2, b3):
-    X = np.zeros((4, 150), float)
-    Y = np.zeros((3, 150), int)
-
+    # X = np.zeros((4, 150), float)
+    # Y = np.zeros((3, 150), int)
+    #
     correct = 0
+    #
+    # Iris = open("Iris.csv", "r")
+    # Irisreader = csv.reader(Iris)
+    # count = 0
+    # for row in Irisreader:
+    #     if row[0] != "Id":
+    #         #if (row[0] >= "41" and row[0] < "51") or (row[0] >= "91" and row[0] < "101") or (row[0] >= "141" and row[0] < "151"):
+    #             X[0, count] = float(row[1])
+    #             X[1, count] = float(row[2])
+    #             X[2, count] = float(row[3])
+    #             X[3, count] = float(row[4])
+    #             if row[5] == "Iris-setosa":
+    #                 Y[0, count] = 1
+    #                 Y[1, count] = 0
+    #                 Y[2, count] = 0
+    #             elif row[5] == "Iris-versicolor":
+    #                 Y[0, count] = 0
+    #                 Y[1, count] = 1
+    #                 Y[2, count] = 0
+    #             elif row[5] == "Iris-virginica":
+    #                 Y[0, count] = 0
+    #                 Y[1, count] = 0
+    #                 Y[2, count] = 1
+    #             count += 1
+    # Iris.close()
+    shape = Y_test.shape
+    Y = np.zeros((3, shape[1]), int)
+    for i in range(0, shape[1]):
+        if Y_test[0, i] == "Iris-setosa":
+            Y[0, i] = 1
+            Y[1, i] = 0
+            Y[2, i] = 0
+        elif Y_test[0, i] == "Iris-versicolor":
+            Y[0, i] = 0
+            Y[1, i] = 1
+            Y[2, i] = 0
+        elif Y_test[0, i] == "Iris-virginica":
+            Y[0, i] = 0
+            Y[1, i] = 0
+            Y[2, i] = 1
 
-    Iris = open("Iris.csv", "r")
-    Irisreader = csv.reader(Iris)
-    count = 0
-    for row in Irisreader:
-        if row[0] != "Id":
-            #if (row[0] >= "41" and row[0] < "51") or (row[0] >= "91" and row[0] < "101") or (row[0] >= "141" and row[0] < "151"):
-                X[0, count] = float(row[1])
-                X[1, count] = float(row[2])
-                X[2, count] = float(row[3])
-                X[3, count] = float(row[4])
-                if row[5] == "Iris-setosa":
-                    Y[0, count] = 1
-                    Y[1, count] = 0
-                    Y[2, count] = 0
-                elif row[5] == "Iris-versicolor":
-                    Y[0, count] = 0
-                    Y[1, count] = 1
-                    Y[2, count] = 0
-                elif row[5] == "Iris-virginica":
-                    Y[0, count] = 0
-                    Y[1, count] = 0
-                    Y[2, count] = 1
-                count += 1
-    Iris.close()
-    activations = all_z_activations(w0, w1, w2, b1, b2, b3, X)
-    for i in range(0, np.shape(X)[1]):
+
+    activations = all_z_activations(w0, w1, w2, b1, b2, b3, X_test)
+    for i in range(0, np.shape(X_test)[1]):
         if activations[5][0,i] > activations[5][1,i] and activations[5][0,i] > activations[5][2,i]:
             output = "Iris-setosa"
             if Y[0,i] == 1:
@@ -177,11 +207,11 @@ def test(w0, w1, w2, b1, b2, b3):
             output = "Iris-virginica"
             if Y[2,i] == 1:
                 correct += 1
-    return (correct/count)*100
+    return (correct/(np.shape(X_test)[1]))*100
 
 
 
 
 
 
-main()
+main_train()
