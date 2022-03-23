@@ -3,6 +3,7 @@ import csv
 import time
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import random
 #import mapplotlib.pyplot as plt
 
 # 2 hidden layers, 5 neurons each
@@ -16,10 +17,28 @@ Iris = pd.read_csv("Iris.csv")
 X = Iris.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]]
 y = Iris.loc[:150, ["Species"]]
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-X_train = np.transpose(X_train.values)
-X_test = np.transpose(X_test.values)
-Y_train = np.transpose(Y_train.values)
-Y_test = np.transpose(Y_test.values)
+X_train = X_train.values
+X_test = X_test.values
+Y_train = Y_train.values
+Y_test = Y_test.values
+# data augmentation
+for i in range(X_train.shape[0]):
+    temp = X_train[i].copy()
+    no = random.randint(0,3)
+    temp[no] = temp[no] * 0.999
+    X_train = np.append(X_train, [temp], axis = 0)
+    Y_train = np.append(Y_train, [Y_train[i]], axis = 0)
+for i in range(X_train.shape[0]):
+    temp = X_train[i].copy()
+    no = random.randint(0,3)
+    temp[no] = temp[no] * 1.0001
+    X_train = np.append(X_train, [temp], axis = 0)
+    Y_train = np.append(Y_train, [Y_train[i]], axis = 0)
+
+X_train = np.transpose(X_train)
+X_test = np.transpose(X_test)
+Y_train = np.transpose(Y_train)
+Y_test = np.transpose(Y_test)
 
 shape = Y_train.shape
 Y = np.zeros((3, shape[1]), int)

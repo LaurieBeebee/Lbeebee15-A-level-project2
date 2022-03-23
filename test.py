@@ -36,13 +36,14 @@ X = x.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]]
 X = X.values
 #X[len(X)+1] += [5.2,5.2,5.2,5.2]
 #X = np.append(Y,[[5.2,5.2,5.2,5.2]], axis=0)
-print(X)
-for i in range(0,150):
-    temp = X[i]
+for i in range(150):
+    temp = X[i].copy()
     no = random.randint(0,3)
     temp[no] = temp[no] * 0.999
-    print(temp)
-    new = np.append(X, [[5.2,5.2,5.2,5.2]], axis = 0)
-print(new)
+    X = np.append(X, [temp], axis = 0)
+
+np.set_printoptions(threshold = 3)
+print(X)
+
 
 
