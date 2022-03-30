@@ -4,7 +4,7 @@ import time
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import random
-#import mapplotlib.pyplot as plt
+import matplotlip as plt
 
 # 2 hidden layers, 5 neurons each
 
@@ -136,13 +136,17 @@ def main_train():
         test_result += test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2])
         count += 1
     print(test_result/count)
+    yplot = np.array(costs)
+    plt.plot(yplot)
+    plt.show() #todo do not know why this isn't being recognised at all
 
 def test(w0, w1, w2, b1, b2, b3):
     correct = 0
+
     shape = Y_test.shape
     Y = np.zeros((3, shape[1]), int)
     for i in range(0, shape[1]):
-        if Y_test[0, i] == "Iris-setosa":
+        if Y_test[0, i] == "Iris-setosa": #todo are these unresolved references actually effecting anything or not????
             Y[0, i] = 1
             Y[1, i] = 0
             Y[2, i] = 0
@@ -169,6 +173,8 @@ def test(w0, w1, w2, b1, b2, b3):
             output = "Iris-virginica"
             if Y[2,i] == 1:
                 correct += 1
+    Y_test = train_test_split(X, y, test_size=0.2, random_state=0)[2]
+    Y_test.values()
     return (correct/(np.shape(X_test)[1]))*100
 
 main_train()
