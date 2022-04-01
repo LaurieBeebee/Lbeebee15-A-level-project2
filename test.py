@@ -29,7 +29,7 @@ import numpy as np
 # x = pd.read_csv('Iris.csv')
 # print(x.loc[:150, ['SepalLengthCm', 'PetalLengthCm']])
 
-#todo testing the data augmentation for the database
+#testing the data augmentation for the database
 
 x = pd.read_csv('Iris.csv')
 X = x.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]]

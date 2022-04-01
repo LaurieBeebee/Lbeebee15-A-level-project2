@@ -57,7 +57,7 @@ def inv_sigmoid(x):
 def z(weight, prev_activation, bias):
     z = np.dot(weight, prev_activation) + bias
     return z
-#todo need to try and do ln instead of the bloody quadratic as well as try and see if the
+
 def all_z_activations(w0, w1, w2, b1, b2, b3, x):
     z1 = z(w0, x, b1)
     a1 = sigmoid(z1)

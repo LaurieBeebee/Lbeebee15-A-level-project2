@@ -121,8 +121,18 @@ def main_train():
     biases = bias_set()
     z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
     toc = time.time()
+    count = 0
     while toc-tic <= 120:
-        z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
+        if count == 0:
+            z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
+        else:
+            weights[0] = change_weights_and_biases[0]
+            weights[1] = change_weights_and_biases[1]
+            weights[2] = change_weights_and_biases[2]
+            biases[0] = change_weights_and_biases[3]
+            biases[1] = change_weights_and_biases[4]
+            biases[2] = change_weights_and_biases[5]
+            z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
         print(weights[1])
         error = errors(weights[1], weights[2], z_and_activations[0], z_and_activations[1], z_and_activations[2], z_and_activations[5], Y)
         derivitive_cost_to_weight = deriv_cost_to_weight(error[0], error[1], error[2], z_and_activations[3], z_and_activations[4], X_train)
@@ -136,6 +146,7 @@ def main_train():
     while count != 30:
         test_result += test(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2])
         count += 1
+
         Y_test = train_test_split(X, y, test_size=0.5, random_state=0)[3]
         Y_test = np.transpose(Y_test.values)
     print(test_result/count)
