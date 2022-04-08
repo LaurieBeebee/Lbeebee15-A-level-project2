@@ -1,5 +1,4 @@
 import numpy as np
-import csv
 import time
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -9,8 +8,6 @@ import matplotlib.pyplot as plt
 # 2 hidden layers, 5 neurons each
 
 LEARNING_RATE = 0.005
-
-Y = np.zeros((3, 150), int)
 
 Iris = pd.read_csv("Iris.csv")
 X = Iris.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]]
@@ -71,7 +68,7 @@ def sigmoid(x):
         x = x.astype(float)
         return 1/(1+np.exp(-x))
 
-def inv_sigmoid(x):
+def deriv_sigmoid(x):
         x = x.astype(float)
         return (np.exp(-x)/(np.exp(-x)+1)**2)
 
@@ -89,9 +86,9 @@ def all_z_activations(w0, w1, w2, b1, b2, b3, x):
     return z1, z2, z3, a1, a2, a3
 
 def errors(w1, w2, z1, z2, z3, a3, Y):
-    errors3 = (a3 - Y) #* inv_sigmoid(z3)
-    errors2 = np.dot(np.transpose(w2), errors3)*inv_sigmoid(z2)
-    errors1 = np.dot(np.transpose(w1), errors2)*inv_sigmoid(z1)
+    errors3 = (a3 - Y)
+    errors2 = np.dot(np.transpose(w2), errors3)*deriv_sigmoid(z2)
+    errors1 = np.dot(np.transpose(w1), errors2)*deriv_sigmoid(z1)
     return errors1, errors2, errors3
 
 def deriv_cost_to_weight(errors1, errors2, errors3, a1, a2, x):
@@ -123,7 +120,6 @@ def main_train():
     toc = time.time()
     while toc-tic <= 120:
         z_and_activations = all_z_activations(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], X_train)
-        print(weights[1])
         error = errors(weights[1], weights[2], z_and_activations[0], z_and_activations[1], z_and_activations[2], z_and_activations[5], Y)
         derivitive_cost_to_weight = deriv_cost_to_weight(error[0], error[1], error[2], z_and_activations[3], z_and_activations[4], X_train)
         change_weights_and_biases = gradient_descent(weights[0], weights[1], weights[2], biases[0], biases[1], biases[2], error[0], error[1], error[2], derivitive_cost_to_weight[0], derivitive_cost_to_weight[1], derivitive_cost_to_weight[2], X_train)

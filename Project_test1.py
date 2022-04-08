@@ -94,7 +94,7 @@ class Network:
         for i in range(0,len(weights)):
             for x in range(0,len(weights[i])):
                 for y in range(0,len(weights[i][x])):
-                    temp.append(weights[i][x][y]*prev_activ[y]) #have no clue if this is the right number of loops
+                    temp.append(weights[i][x][y]*prev_activ[y])
                     if y+1 == len(weights[i][x]):
                         for h in range(0,len(temp)):
                             temp_sum += temp[h]
@@ -103,7 +103,7 @@ class Network:
                 z_input.append(temp_sum)
                 temp_sum = 0
             prev_activ = []
-            for q in range(0,len(z_input)):  # i think i fixed the error by removing the -1 here
+            for q in range(0,len(z_input)):
                 prev_activ.append(self.sigmoid(z_input[q]))
             z[i] = z_input
             z_input = []
@@ -239,8 +239,8 @@ class Network:
 
 start = time.process_time()
 flower = Network(2,5,3,0.05)
-# all_weights = flower.total_weights()
-# print(all_weights)
+all_weights = flower.total_weights()
+print(all_weights)
 # all_biases = flower.total_bias()
 # print(all_biases)
 # all_z = flower.z(all_weights,all_biases)

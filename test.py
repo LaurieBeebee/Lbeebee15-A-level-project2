@@ -33,17 +33,24 @@ import numpy as np
 
 x = pd.read_csv('Iris.csv')
 X = x.loc[:150, ["SepalLengthCm","SepalWidthCm","PetalLengthCm","PetalWidthCm"]]
-X = X.values
-#X[len(X)+1] += [5.2,5.2,5.2,5.2]
-#X = np.append(Y,[[5.2,5.2,5.2,5.2]], axis=0)
-for i in range(150):
-    temp = X[i].copy()
-    no = random.randint(0,3)
-    temp[no] = temp[no] * 0.999
-    X = np.append(X, [temp], axis = 0)
-
-np.set_printoptions(threshold = 3)
 print(X)
+X = X.values
+print(X)
+print(X.transpose())
+
+# #X[len(X)+1] += [5.2,5.2,5.2,5.2]
+# #X = np.append(Y,[[5.2,5.2,5.2,5.2]], axis=0)
+# for i in range(150):
+#     temp = X[i].copy()
+#     no = random.randint(0,3)
+#     temp[no] = temp[no] * 0.999
+#     X = np.append(X, [temp], axis = 0)
+#
+# np.set_printoptions(threshold = 3)
+# print(X)
+
+
+# print(np.zeros((4,5)))
 
 
 
